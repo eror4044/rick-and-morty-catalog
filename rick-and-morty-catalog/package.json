@@ -42,6 +42,14 @@
 		"vite": "^6.0.0"
 	},
 	"dependencies": {
-		"@sveltejs/adapter-cloudflare": "^4.8.0"
-	}
+		"@picocss/pico": "^2.0.6",
+		"@sveltejs/adapter-cloudflare": "^4.8.0",
+		"@urql/svelte": "^4.2.2",
+		"graphql": "^16.10.0"
+	},
+	"description": "Everything you need to build a Svelte library, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).",
+	"main": "svelte.config.js",
+	"keywords": [],
+	"author": "",
+	"license": "ISC"
 }
