@@ -1,58 +1,175 @@
-# create-svelte
+Rick and Morty Catalog
+This is a SvelteKit-based project that showcases episodes, characters, and seasons of the popular Rick and Morty series. It uses the Rick and Morty GraphQL API for data retrieval.
 
-Everything you need to build a Svelte library, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+🚀 Features
+Browse all seasons and their episodes.
+View episode details, including characters featured in each episode.
+View character details, including their appearances across episodes.
+Search functionality for episodes and characters using GraphQL.
+Clean and responsive UI using PicoCSS.
+Progressive form enhancement with loading state handling.
+📦 Tech Stack
+Framework: SvelteKit
+GraphQL Client: URQL
+Styling: PicoCSS
+API: Rick and Morty GraphQL API
+Hosting: Cloudflare Pages
+Type Safety: TypeScript
+🔧 Installation
+Clone the repository:
 
-Read more about creating a library [in the docs](https://svelte.dev/docs/kit/packaging).
+bash
+Copy code
+git clone https://github.com/your-username/rick-and-morty-catalog.git
+cd rick-and-morty-catalog
+Install dependencies:
 
-## Creating a project
+bash
+Copy code
+npm install
+Run the development server:
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
+bash
+Copy code
 npm run dev
+Open the app in your browser:
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+arduino
+Copy code
+http://localhost:5173
+📂 Project Structure
+plaintext
+Copy code
+src/
+│
+├── lib/                        # Reusable components and utilities
+│   ├── components/             # Universal UI components
+│   │   ├── Card.svelte         # Reusable Card component
+│   │   └── GridContainer.svelte# Grid layout for displaying items
+│   ├── graphql/                # GraphQL queries and client setup
+│   │   ├── client.ts           # URQL GraphQL client configuration
+│   │   └── queries.ts          # GraphQL queries
+│   ├── models/                 # TypeScript models for type safety
+│   │   ├── Character.ts
+│   │   ├── Episode.ts
+│   │   └── Season.ts
+│   └── utils/                  # Utility functions
+│       └── formatDate.ts       # Date formatting utility
+│
+├── routes/                     # Application routes
+│   ├── +layout.svelte          # App layout with navigation
+│   ├── +page.svelte            # Home page: seasons overview
+│   ├── search/                 # Search functionality
+│   │   └── +page.svelte
+│   ├── character/              # Character details
+│   │   └── [characterId]/+page.svelte
+│   └── season/                 # Season and episode details
+│       └── [seasonId]/+page.svelte
+│
+├── static/                     # Static assets (e.g., images, icons)
+└── README.md                   # Project documentation
+🌐 GraphQL API Endpoints
+1. Search
+Search episodes and characters:
+graphql
+Copy code
+query ($name: String!) {
+  characters(filter: { name: $name }) {
+    results {
+      id
+      name
+      image
+      status
+    }
+  }
+  episodes(filter: { name: $name }) {
+    results {
+      id
+      name
+      episode
+      air_date
+    }
+  }
+}
+2. Episode Details
+Fetch episode details by ID:
+graphql
+Copy code
+query ($id: ID!) {
+  episode(id: $id) {
+    id
+    name
+    episode
+    air_date
+    characters {
+      id
+      name
+      image
+    }
+  }
+}
+3. Character Details
+Fetch character details by ID:
+graphql
+Copy code
+query ($id: ID!) {
+  character(id: $id) {
+    id
+    name
+    status
+    species
+    gender
+    image
+    episode {
+      id
+      name
+      episode
+    }
+  }
+}
+🛠️ Deployment
+The project uses Cloudflare Pages for deployment.
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
-
-## Building
-
-To build your library:
-
-```bash
-npm run package
-```
-
-To create a production version of your showcase app:
-
-```bash
+Steps for Deployment:
+Push your code to GitHub.
+Link the repository to Cloudflare Pages.
+Specify the build command:
+bash
+Copy code
 npm run build
-```
+Set the output directory to:
+bash
+Copy code
+.svelte-kit/output
+🧪 Testing
+Run the app locally and test all routes:
 
-You can preview the production build with `npm run preview`.
+Home Page: View seasons.
+Search: Verify search functionality.
+Character Details: Check character information and episodes.
+Episode Details: Verify episode data and character list.
+🤝 Contributions
+Contributions are welcome! To contribute:
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Fork the repository.
+Create a new branch:
+bash
+Copy code
+git checkout -b feature/your-feature
+Commit your changes:
+bash
+Copy code
+git commit -m "Add new feature"
+Push to your branch:
+bash
+Copy code
+git push origin feature/your-feature
+Submit a Pull Request.
+📄 License
+This project is licensed under the MIT License.
 
-## Publishing
-
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
-
-```bash
-npm publish
-```
+🎉 Acknowledgements
+SvelteKit
+URQL
+Rick and Morty API
+PicoCSS
