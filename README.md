@@ -1,7 +1,3 @@
-Вот улучшенный **README.md**, отформатированный с Markdown разметкой так, чтобы он выглядел привлекательно в GitHub:
-
----
-
 # 🎥 **Rick and Morty Catalog**
 
 This project is a **SvelteKit**-based catalog application that displays **episodes**, **characters**, and **seasons** from the popular *Rick and Morty* series. Data is retrieved dynamically using the **Rick and Morty GraphQL API**.
