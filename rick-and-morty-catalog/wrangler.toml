@@ -1,0 +1,12 @@
+name = "rick-and-morty-catalog"
+compatibility_date = "2024-12-16"
+node_compat = true
+
+[build]
+command = "npm run build"
+cwd = "."
+upload_format = "modules"
+
+[build.upload]
+format = "modules"
+dir = "build"
