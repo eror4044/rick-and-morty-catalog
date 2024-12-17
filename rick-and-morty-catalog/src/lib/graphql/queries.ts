@@ -51,6 +51,9 @@ export const GET_EPISODE_DETAILS = gql`
         id
         name
         image
+        status
+        gender
+        created
       }
     }
   }
@@ -68,6 +71,7 @@ export const GET_CHARACTER_DETAILS = gql`
       episode {
         id
         name
+        created
         episode
       }
     }

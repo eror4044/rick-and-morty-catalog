@@ -1,27 +1,28 @@
 import { client } from "$lib/graphql/client.ts";
 import { GET_EPISODES_PAGE } from "$lib/graphql/queries.ts";
+import type { Episode } from "$lib/models/Episode.ts";
 import { error } from "@sveltejs/kit";
 
-interface Episode {
-  id: string;
-  name: string;
-  episode: string;
-  air_date: string;
+interface EpisodesPage {
+  results: Episode[];
+  info: {
+    next: number | null;
+  };
 }
-
-
 
 export async function load() {
   try {
-    let allEpisodes = [];
-    let nextPage = 1;
+    let allEpisodes: Episode[] = [];
+    let nextPage: number | null = 1;
 
     while (nextPage) {
       const response = await client
-        .query(GET_EPISODES_PAGE, { page: nextPage })
+        .query<{ episodes: EpisodesPage }>(GET_EPISODES_PAGE, {
+          page: nextPage,
+        })
         .toPromise();
 
-      if (!response.data || !response.data.episodes) {
+      if (!response.data?.episodes) {
         throw error(500, "Failed to fetch episodes");
       }
 
@@ -31,14 +32,17 @@ export async function load() {
       nextPage = info.next;
     }
 
-    const seasons = allEpisodes.reduce((acc, episode) => {
-      const season = episode.episode.match(/S(\d{2})/)?.[1];
-      if (season) {
-        acc[season] = acc[season] || [];
-        acc[season].push(episode);
-      }
-      return acc;
-    }, {});
+    const seasons: Record<string, Episode[]> = allEpisodes.reduce(
+      (acc: Record<string, Episode[]>, episode: Episode) => {
+        const season = episode.episode.match(/S(\d{2})/)?.[1];
+        if (season) {
+          acc[season] = acc[season] || [];
+          acc[season].push(episode);
+        }
+        return acc;
+      },
+      {}
+    );
 
     return { seasons };
   } catch (err) {

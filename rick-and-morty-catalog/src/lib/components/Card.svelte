@@ -3,6 +3,7 @@
   export let subtitle: string;
   export let imageUrl: string = "";
   export let link: string = "";
+  export let footer: string = "";
 </script>
 
 <a href={link} class="card-container">
@@ -13,6 +14,11 @@
     <header>{title}</header>
     {#if subtitle}
       <p class="card-subtitle">{subtitle}</p>
+    {/if}
+    {#if footer}
+      <footer>
+        <p class="card-subtitle">{footer}</p>
+      </footer>
     {/if}
   </article>
 </a>
@@ -33,6 +39,7 @@
     transition:
       transform 0.3s,
       box-shadow 0.3s;
+    max-width: 250px;
   }
 
   .card:hover {
@@ -42,20 +49,28 @@
 
   .card-image {
     width: 100%;
-    height: 150px;
     object-fit: cover;
     border-radius: 8px;
     margin-bottom: 0.5rem;
   }
 
   .card header {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: bold;
     color: #007bff;
+    display: flex;
+    min-height: 95px;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+  }
+  .card footer p {
+    font-size: 0.8rem;
+    margin: 0;
   }
 
   .card-subtitle {
-    font-size: 1rem;
+    font-size: 0.8rem;
     color: #555;
   }
 </style>

@@ -1,32 +1,52 @@
-import { client } from "$lib/graphql/client.js";
-import { SEARCH_QUERY } from "$lib/graphql/queries.js";
-import { json, fail } from "@sveltejs/kit";
+import { client } from "$lib/graphql/client.ts";
+import { SEARCH_QUERY } from "$lib/graphql/queries.ts";
+import type { Character } from "$lib/models/Character.ts";
+import type { Episode } from "$lib/models/Episode.ts";
+import { type Actions, fail, json } from "@sveltejs/kit";
 
-export const actions = {
+
+export interface SearchResults {
+  characters: Character[] | null;
+  episodes: Episode[] | null;
+  success: boolean;
+  error:string;
+}
+
+export const actions: Actions = {
   default: async ({ request }) => {
     const formData = await request.formData();
-    const name = formData.get("query");
+    const query = formData.get('query')?.toString().trim();
 
-    if (!name) {
-      return fail(400, { error: "Query must be at least 3 characters" });
+    if (!query || query.length < 3) {
+      return fail(400, { error: 'Query must be at least 3 characters' });
     }
 
     try {
-      const response = await client.query(SEARCH_QUERY, { name });
 
-      const characters = response.data.characters.results || null
-      const episodes = response.data.episodes.results || null
+      const { data, error: graphqlError } = await client
+        .query(SEARCH_QUERY, { name: query })
+        .toPromise();
+
+      if (graphqlError) {
+        console.error('GraphQL Error:', graphqlError);
+        return fail(500, { error: 'Failed to fetch data' });
+      }
+
+      const characters: Character[] = data?.characters?.results ?? [];
+      const episodes: Episode[] = data?.episodes?.results ?? [];
 
       if (characters.length === 0 && episodes.length === 0) {
-        return fail(404, { results: [], error: "No results found" });
+        return fail(404, { results: [], error: 'No results found' });
       }
 
       return {
+        success: true,
         characters,
         episodes,
-      };
+      } as SearchResults;
     } catch (err) {
-      return fail(500, { error: "Failed to fetch data" });
+      console.error('Error executing search:', err);
+      return fail(500, { error: 'An unexpected error occurred' });
     }
   },
 };

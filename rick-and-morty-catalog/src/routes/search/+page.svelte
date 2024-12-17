@@ -1,71 +1,78 @@
-<script>
-  // @ts-nocheck
+<script lang="ts">
   import { enhance } from "$app/forms";
-  export let form;
-  
+  import GridContainer from "$lib/components/GridContainer.svelte";
+  import Card from "$lib/components/Card.svelte";
+  import type { SearchResults } from "./proxy+page.server.ts";
+
+  export let form: SearchResults | null;
+
+  let isLoading = false;
+
+  function onSubmit() {
+    isLoading = true;
+    setTimeout(() => {
+      isLoading = false;
+    }, 1000);
+  }
 </script>
 
 <section>
-  <div class="container-fluid">
+  <div class="container">
     <h1>Search for Episodes and Characters</h1>
-
-    <form method="POST" use:enhance class="form_wrapper">
-      <div class="container-sm">
-        <label for="query">Enter your search:</label>
-        <input
-          type="text"
-          id="query"
-          name="query"
-          placeholder="Enter at least 3 characters"
-          minlength="3"
-          required
-          class:invalid={form?.error}
-        />
-        <button type="submit" class="primary">Search</button>
-      </div>
+    <form method="POST" on:submit={onSubmit} use:enhance class="form_wrapper">
+      <label for="query">Enter your search:</label>
+      <input
+        type="text"
+        id="query"
+        name="query"
+        placeholder="Enter at least 3 characters"
+        minlength="3"
+        required
+      />
+      <button type="submit" disabled={isLoading} class="primary">
+        {#if isLoading}
+          Searching...
+        {:else}
+          Search
+        {/if}
+      </button>
     </form>
-  </div>
 
-  {#if form?.error}
-    <p class="error">{form.error}</p>
-  {:else if form}
-    {#if form.characters.length === 0 && form.episodes.length === 0}
-      <p>No results found.</p>
-    {:else}
-      <div class="container-fluid">
-        <h2>Characters</h2>
-        <div class="card_wrapper">
-          {#each form.characters as character}
-            <a href={"character/" + character.id}>
-              <article class="card">
-                <header>
-                  <img src={character.image} alt={character.name} />
-                </header>
-                <h3>{character.name}</h3>
-                <p>Species: {character.species}</p>
-                <footer>Status: <strong>{character.status}</strong></footer>
-              </article>
-            </a>
-          {/each}
-        </div>
-
-        <h2>Episodes</h2>
-        <div class="card_wrapper">
-          {#each form.episodes as episode}
-            <a href={"episode/" + episode.id}>
-              <article class="card">
-                <header>
-                  <h3>{episode.name}</h3>
-                </header>
-                <p>Episode: {episode.episode}</p>
-                <footer>Air Date: {episode.air_date}</footer>
-              </article>
-            </a>
-          {/each}
-        </div>
-      </div>
+    {#if form?.error}
+      <p class="error">{form.error}</p>
     {/if}
-  {/if}
+
+    {#if form?.success}
+      {#if form.characters?.length === 0 && form.episodes?.length === 0}
+        <p class="no-results">No results found.</p>
+      {/if}
+
+      {#if form.characters?.length > 0}
+        <GridContainer title="Characters">
+          {#each form.characters as character}
+            <Card
+              title={character.name}
+              subtitle={`Species: ${character.species}`}
+              imageUrl={character.image}
+              link={`/character/${character.id}`}
+            />
+          {/each}
+        </GridContainer>
+      {/if}
+
+      {#if form.episodes?.length > 0}
+        <GridContainer title="Episodes">
+          {#each form.episodes as episode}
+            <Card
+              title={episode.name}
+              subtitle={`Episode: ${episode.episode}`}
+              link={`/episode/${episode.id}`}
+            />
+          {/each}
+        </GridContainer>
+      {/if}
+    {/if}
+  </div>
 </section>
 
 <style>
@@ -73,68 +80,47 @@
     text-align: center;
     margin-bottom: 2rem;
   }
-  a {
-    text-decoration: none;
-    color: unset;
-  }
-  .error {
-    color: var(--error-color, red);
-    text-align: center;
-    margin-top: 1rem;
-  }
 
   .form_wrapper {
     display: flex;
-    align-items: flex-end;
     justify-content: center;
+    flex-direction: column;
+    align-items: center;
     gap: 1rem;
-  }
-
-  form {
     margin-bottom: 2rem;
   }
 
   input {
     padding: 0.75rem;
     font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
   }
 
-  input.invalid {
-    border-color: var(--error-color, red);
+  button {
+    padding: 0.75rem 1.5rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
   }
 
-  button.primary {
-    background-color: var(--primary-color, #007bff);
+  button[disabled] {
+    background-color: #ccc;
+    cursor: not-allowed;
   }
 
-  button.primary:hover {
-    background-color: var(--primary-hover-color, #0056b3);
+  button:hover {
+    background-color: #0056b3;
   }
 
-  .card_wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
-  }
-  .card {
+  .error,
+  .no-results {
     text-align: center;
-    width: 340px;
-  }
-
-  .card header img {
-    max-width: 100%;
-    border-radius: 8px;
-  }
-
-  .card h3 {
+    color: red;
     margin-top: 1rem;
-    font-size: 1.25rem;
-  }
-
-  .card footer {
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    color: var(--secondary-text-color, #6c757d);
   }
 </style>

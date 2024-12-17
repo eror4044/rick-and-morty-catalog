@@ -1,73 +1,63 @@
-<script>
-  export let data;
+<script lang="ts">
+  import GridContainer from "$lib/components/GridContainer.svelte";
+  import Card from "$lib/components/Card.svelte";
+  import type { Episode } from "$lib/models/Episode.ts";
+  import { formatDate } from "$lib/utils/formatDate.ts";
+
+  export let data: {
+    episode: Episode;
+  };
 </script>
 
 {#if data.episode}
-  <h1>{data.episode.name}</h1>
-  <p><strong>Air Date:</strong> {data.episode.air_date}</p>
-  <p><strong>Episode:</strong> {data.episode.episode}</p>
+  <h1 class="page-title">{data.episode.name}</h1>
+  <p class="details"><strong>Air Date:</strong> {data.episode.air_date}</p>
+  <p class="details"><strong>Episode:</strong> {data.episode.episode}</p>
 
   {#if data.episode.characters && data.episode.characters.length > 0}
-    <h2>Characters</h2>
-    <div class="grid">
-      {#each data.episode.characters as character}
-        <a href="/character/{character.id}">
-          <article class="card">
-            <img src={character.image} alt={character.name} />
-            <h3>{character.name}</h3>
-          </article>
-        </a>
+    <GridContainer title="Characters">
+      {#each data.episode.characters as character (character.id)}
+        <Card
+          title={character.name}
+          imageUrl={character.image}
+          subtitle={`Gender: ${character.gender}`}
+          link={`/character/${character.id}`}
+          footer={`Created: ${formatDate(character.created)}`}
+        />
       {/each}
-    </div>
+    </GridContainer>
   {:else}
-    <p>No characters available for this episode.</p>
+    <p class="no-characters">No characters available for this episode.</p>
   {/if}
 {:else}
-  <p>Loading episode data...</p>
+  <p class="loading">Loading episode data...</p>
 {/if}
 
 <style>
-  h1 {
+  .page-title {
     margin-top: 1rem;
+    text-align: center;
+    font-size: 2rem;
     color: #333;
   }
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-
-  .card {
+  .details {
     text-align: center;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    transition:
-      transform 0.3s,
-      box-shadow 0.3s;
+    font-size: 1.1rem;
+    color: #555;
+    margin: 0.5rem 0;
   }
 
-  .card img {
-    width: 100%;
-    border-radius: 8px;
-    object-fit: cover;
+  .loading {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #777;
   }
 
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-  }
-
-  h3 {
-    margin-top: 0.5rem;
-  }
-
-  p {
-    margin-top: 0.5rem;
-    font-size: 1rem;
+  .no-characters {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 1.2rem;
     color: #555;
   }
 </style>

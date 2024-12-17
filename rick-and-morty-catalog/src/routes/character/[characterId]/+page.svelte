@@ -1,6 +1,8 @@
 <script lang="ts">
   import Card from '$lib/components/Card.svelte';
   import GridContainer from '$lib/components/GridContainer.svelte';
+  import { formatDate } from '$lib/utils/formatDate.ts';
+
   export let data;
 </script>
 
@@ -19,6 +21,7 @@
     <Card
       title={ep.name}
       subtitle={ep.episode}
+      footer={`created: ${formatDate(ep.created)}`}
       link={`/episode/${ep.id}`}
     />
   {/each}
